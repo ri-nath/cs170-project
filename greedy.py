@@ -81,6 +81,10 @@ def solver(Gold: nx.graph):
         bk = k
         Gout = G.copy()
     print("MIN__________________: ", m)
+
+    # Band-aid patch, teams should be one-indexed
+    for v in Gout.nodes:
+        Gout.nodes[v]['team'] = Gout.nodes[v]['team'] + 1
     return Gout
 
 greedy = read_input('inputs/example.in')
@@ -89,6 +93,6 @@ greedy = solver(greedy)
 example = read_input('inputs/example.in')
 example = read_output(example, 'outputs/example.out')
 
-print(score(greedy), score(example))
+print(score(greedy, separated=True), score(example, separated=True))
 
-visualize(greedy)
+# visualize(greedy)
