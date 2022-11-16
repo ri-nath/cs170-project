@@ -26,7 +26,7 @@ def solver(Gold: nx.graph):
         prev[team] = u
         teams[team] += [u]
         team += 1
-        for i in range(1,k):
+        for i in range(1, k):
             pre = (team-1)%k
             print("pre: ", pre)
             print("prev: ", prev)
@@ -43,7 +43,7 @@ def solver(Gold: nx.graph):
             print("curr: ", curr)
             print("prev: ", prev)
             print("teams: ", teams)
-            next = max([n for n in G.nodes() if G.nodes[n]['visited'] == 0], key=lambda x: sum([G[u][x]['weight'] for u in G.neighbors(x) if u in [u for u in teams[i] for i in range(k) if i != curr]]))
+            next = min([n for n in G.nodes() if G.nodes[n]['visited'] == 0], key=lambda x: sum([G[u][x]['weight'] for u in G.neighbors(x) if u in [u for u in teams[curr]]]))
             G.nodes[next]['visited'] = 1
             G.nodes[next]['team'] = team % k
             prev[team%k] = next
