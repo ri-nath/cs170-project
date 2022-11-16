@@ -23,5 +23,6 @@ example = read_input('inputs/example.in')
 example = read_output(example, 'outputs/example.out')
 
 print(score(guess), score(example))
+# 512556.0841108902, 1219.2493960703473
 
 visualize(guess)
