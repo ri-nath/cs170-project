@@ -101,6 +101,10 @@ def score(G: nx.Graph, separated=False):
         return C_w, K_COEFFICIENT * math.exp(K_EXP * k), math.exp(B_EXP * b)
     return C_w + K_COEFFICIENT * math.exp(K_EXP * k) + math.exp(B_EXP * b)
 
+# def score_fast(G: nx.Graph, D, cp, cw, ck, b, bnorm):
+#     for n in D:
+#         bi = 
+#         bnorm = math.sqrt(math.pow(bnorm, 2) - math.pow(b[], 2) - math.pow(b[], 2) + math.pow(b[] - (1/G.number_of_nodes), 2) + math.pow(b[] - (1/G.number_of_nodes), 2))
 
 def visualize(G: nx.Graph):
     output = G.nodes(data='team', default=0)
