@@ -1,17 +1,18 @@
+from typing import Callable
+
 import networkx as nx
-import numpy as np
+
 from starter import *
-import math
-import random
+from test import *
 
 # given G and a subset S, returns a fn(v) which sums weights from v to S 
-def sum_weights_to_subset(G, S):
-    def from_vertex(v):
+def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
+    def from_vertex(v: int) -> int:
         edges = [G[v][u]['weight'] for u in G.neighbors(v) if u in S]
         return sum(edges)
     return from_vertex
 
-def solver(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]):    
+def solver(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]) -> nx.Graph:    
     k = len(sources)
     teams = [[s] for s in sources]
 
@@ -34,12 +35,5 @@ def solver(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]):
 
     return G
 
-greedy = read_input('inputs/example.in')
-greedy = solver(greedy)
+test_vs_output(solver)
 
-example = read_input('inputs/example.in')
-example = read_output(example, 'outputs/example.out')
-
-print(score(greedy), score(example))
-
-visualize(greedy)

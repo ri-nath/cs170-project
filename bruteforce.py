@@ -1,22 +1,23 @@
-import networkx as nx
-import numpy as np
-from starter import *
-import math
-import random
 import itertools
+from typing import Iterator
+
+import networkx as nx
+
+from starter import *
+from test import *
 
 # Return G\S
-def without(a: list[int], b: list[int]):
+def without(a: list[int], b: list[int]) -> list[int]:
     return list(filter(lambda n: n not in b, a))
 
 # Given subsets of G assign teams to subsets
-def paint(G: nx.graph, subsets: list[list[int]]):
+def paint(G: nx.graph, subsets: list[list[int]]) -> None:
     for i, s in enumerate(subsets):
         for v in s:
             G.nodes[v]['team'] = i + 1 # 1-indexed?
 
 # yield partitions of S up to size n
-def yield_partitions(S: list[int], n: int):
+def yield_partitions(S: list[int], n: int) -> Iterator[list[int]]:
     if len(S) == n:
         yield [S]
     if len(S) > 0 and n > 0:
@@ -28,44 +29,19 @@ def yield_partitions(S: list[int], n: int):
         # partitions of S up to size n - 1
         yield from yield_partitions(S, n - 1)
 
-def solver(G: nx.graph):
+def solver(G: nx.graph) -> nx.graph:
     best_score, B = 0, None
     for partition in yield_partitions(list(G.nodes), G.number_of_nodes()):
         paint(G, partition)
         new_score = score(G)
         if not B or new_score < best_score:
             best_score, B = new_score, G.copy()
-            # print(best_score) # Uncomment if want logging
+            print(best_score) # Uncomment for logging
 
     return B
 
-### TESTS ###
-def test_on_tiny():
-    def tiny(W, H):
-        weight = 100
-        G = nx.empty_graph(W * H)
-        for i in range(W * H):
-            if i < W*(H-1):
-                G.add_edge(i, i+W, weight=weight)
-            if (i+1) % W != 0:
-                G.add_edge(i, i+1, weight=weight)
-        return G
+# Test on small graph
+test_on_simple_graph(solver)
 
-    alg = tiny(2, 3)
-    alg = solver(alg)
-    print("Score of brute-force on tiny:", score(alg))
-    visualize(alg)
-
-def test_on_example():
-    alg = read_input('inputs/example.in')
-    alg = solver(alg)
-
-    example = read_input('inputs/example.in')
-    example = read_output(example, 'outputs/example.out')
-
-    print("Score of brute-force on example:", score(alg))
-    print("Score of example on example:", score(example));
-    visualize(alg)
-
-test_on_tiny()
-# test_on_example()
+# Test on large graph (takes a lot of time)
+# test_vs_output(solver)
