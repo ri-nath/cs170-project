@@ -62,5 +62,5 @@ def test_on_all_combinations(G):
     
     return B
 
-test_vs_output(test_on_all_combinations)
+# test_vs_output(test_on_all_combinations)
 
