@@ -1,5 +1,6 @@
 from typing import Callable
 
+import itertools
 import networkx as nx
 
 from starter import *
@@ -48,5 +49,17 @@ def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:
 
     return G
 
-test_vs_output(solver)
+def test_on_all_combinations(G):
+    best_score, B = float('inf'), None
+    for k in range(1, G.number_of_nodes()):
+        for sources in itertools.combinations(G.nodes, k):
+            G = solver(G, sources)
+            new_score = score(G)
+            if new_score < best_score:
+                best_score, B = new_score, G.copy()
+                print(k, best_score)
+    
+    return B
+
+test_vs_output(test_on_all_permutations)
 

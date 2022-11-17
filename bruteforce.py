@@ -30,18 +30,18 @@ def yield_partitions(S: list[int], n: int) -> Iterator[list[int]]:
         yield from yield_partitions(S, n - 1)
 
 def solver(G: nx.graph) -> nx.graph:
-    best_score, B = 0, None
+    best_score, B = float('inf'), None
     for partition in yield_partitions(list(G.nodes), G.number_of_nodes()):
         paint(G, partition)
         new_score = score(G)
-        if not B or new_score < best_score:
+        if new_score < best_score:
             best_score, B = new_score, G.copy()
-            print(best_score) # Uncomment for logging
+            print(len(partition), best_score) # Uncomment for logging
 
     return B
 
 # Test on small graph
-test_on_simple_graph(solver)
+# test_on_simple_graph(solver)
 
 # Test on large graph (takes a lot of time)
-# test_vs_output(solver)
+test_vs_output(solver)
