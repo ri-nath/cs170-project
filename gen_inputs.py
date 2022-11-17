@@ -1,7 +1,7 @@
 from starter import *
 import random
 
-def gen_graph(size, edgescale):
+def gen_graph(size, edgescale = 1):
     # random.seed(3141592)
     G = nx.empty_graph(size)
     # G.add_edge(2,1, weight=3)
@@ -9,7 +9,7 @@ def gen_graph(size, edgescale):
     num_edges = 0
     while num_edges < MAX_EDGES/edgescale:
         
-        print(G.nodes())
+        # print(G.nodes())
         l = []
         while len(l) == 0:
             curr = random.randrange(size)
@@ -29,7 +29,7 @@ def large(G: nx.Graph):
     pass
 
 # visualize(small())
-G = gen_graph(N_LARGE, 10)
+G = gen_graph(N_MEDIUM)
 validate_input(G)
 
-write_input(G, "inputs/large.in", True)
+write_input(G, "inputs/medium.in", True)
