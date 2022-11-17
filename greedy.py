@@ -6,32 +6,45 @@ from starter import *
 from test import *
 
 # given G and a subset S, returns a fn(v) which sums weights from v to S 
-def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
-    def from_vertex(v: int) -> int:
-        edges = [G[v][u]['weight'] for u in G.neighbors(v) if u in S]
-        return sum(edges)
-    return from_vertex
+# def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
+#     def from_vertex(v: int) -> int:
+#         edges = [G[v][u]['weight'] for u in G.neighbors(v) if u in S]
+#         return sum(edges)
+#     return from_vertex
 
-def solver(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]) -> nx.Graph:    
+# Adds vertex v to team team, and updates team sums to connected vertices
+def add_to_team(G: nx.graph, teams: list[list[int]], v: int, team: int):
+    G.nodes[v]['team'] = team + 1
+    G.nodes[v]['visited'] = True
+    teams[team].append(v)
+    for v, u, weight in G.edges(v, data='weight'):
+        if team not in G.nodes[u]:
+            G.nodes[u][team] = 0
+        # Tracks sum from team to u        
+        G.nodes[u][team] += weight
+
+def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:    
     k = len(sources)
-    teams = [[s] for s in sources]
+    teams = [[] for _ in sources]
+    to_add = list(range(k))
 
     team = 0
     for u in G.nodes:
         if u in sources:
-            G.nodes[u]['team'] = team + 1
-            G.nodes[u]['visited'] = True
+            add_to_team(G, teams, u, team)
             team += 1
         else:
             G.nodes[u]['visited'] = False
     
-    for i in range(k, G.number_of_nodes()):
-        team = i % k
-        not_visited = filter(lambda v: not G.nodes[v]['visited'], G.nodes)
-        next = min(not_visited, key=sum_weights_to_subset(G, teams[team]))
-        G.nodes[next]['team'] = team + 1
-        G.nodes[next]['visited'] = True
-        teams[team].append(next)
+    for _ in range(k, G.number_of_nodes()):
+        if len(to_add) == 0: to_add = list(range(k))
+        next, team = min(
+            (min(filter(lambda v: not G.nodes[v]['visited'], G.nodes), 
+                key=lambda v: G.nodes[v][team] if team in G.nodes[v] else 0), 
+                team)
+                for team in to_add)
+        to_add.remove(team)
+        add_to_team(G, teams, next, team)
 
     return G
 
