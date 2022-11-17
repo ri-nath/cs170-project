@@ -5,6 +5,7 @@ import networkx as nx
 
 from starter import *
 from test import *
+from shared import *
 
 # given G and a subset S, returns a fn(v) which sums weights from v to S 
 # def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
@@ -51,7 +52,7 @@ def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:
 
 def test_on_all_combinations(G):
     best_score, B = float('inf'), None
-    for k in range(1, G.number_of_nodes()):
+    for k in range(1, get_k_bound(G)):
         for sources in itertools.combinations(G.nodes, k):
             G = solver(G, sources)
             new_score = score(G)
@@ -61,5 +62,5 @@ def test_on_all_combinations(G):
     
     return B
 
-test_vs_output(test_on_all_permutations)
+test_vs_output(test_on_all_combinations)
 
