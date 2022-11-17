@@ -17,7 +17,6 @@ from shared import *
 # Adds vertex v to team team, and updates team sums to connected vertices
 def add_to_team(G: nx.graph, teams: list[list[int]], v: int, team: int):
     G.nodes[v]['team'] = team + 1
-    G.nodes[v]['visited'] = True
     teams[team].append(v)
     for v, u, weight in G.edges(v, data='weight'):
         if team not in G.nodes[u]:
@@ -35,16 +34,15 @@ def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:
         if u in sources:
             add_to_team(G, teams, u, team)
             team += 1
-        else:
-            G.nodes[u]['visited'] = False
     
     for _ in range(k, G.number_of_nodes()):
         if len(to_add) == 0: to_add = list(range(k))
-        next, team = min(
-            (min(filter(lambda v: not G.nodes[v]['visited'], G.nodes), 
+        next, team = min((
+            min(
+                filter(lambda v: not 'team' in G.nodes[v], G.nodes), 
                 key=lambda v: G.nodes[v][team] if team in G.nodes[v] else 0), 
-                team)
-                for team in to_add)
+            team)
+            for team in to_add)
         to_add.remove(team)
         add_to_team(G, teams, next, team)
 
