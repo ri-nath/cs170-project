@@ -8,24 +8,9 @@ from starter import *
 from test import *
 from shared import *
 
-# given G and a subset S, returns a fn(v) which sums weights from v to S 
-# def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
-#     def from_vertex(v: int) -> int:
-#         edges = [G[v][u]['weight'] for u in G.neighbors(v) if u in S]
-#         return sum(edges)
-#     return from_vertex
 
 # Adds vertex v to team team, and updates team sums to connected vertices
-def add_to_team(G: nx.graph, v: int, team: int):
-    G.nodes[v]['team'] = team + 1
-    for u in G.neighbors(v):
-        if team not in G.nodes[u]:
-            G.nodes[u][team] = 0
-        # Tracks sum from team to u        
-        G.nodes[u][team] += G[u][v]['weight']
-
-
-def solver(G: nx.graph, k: int = 5, epochs: int = 10) -> nx.Graph:        
+def solver(G: nx.graph, k: int = 12, epochs: int = 5) -> nx.Graph:        
     i = 0
 
     for u in sorted(range(G.number_of_nodes()), key=lambda _: random.random()):
@@ -33,41 +18,46 @@ def solver(G: nx.graph, k: int = 5, epochs: int = 10) -> nx.Graph:
         G.nodes[u]['team'] = i % k + 1
         i += 1
 
+    V = G.number_of_nodes()
+
     for _ in range(epochs):
+        sum_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
+
         for u in range(G.number_of_nodes()):
             # _, cheapest_team = min((G.nodes[u][team], team) for team in range(k))
-            sums = [0] * k
 
-            for v in G.neighbors(u):
-                sums[G.nodes[v]['team'] - 1] += G[u][v]['weight']
+            # [... (heuristic, Cw, Cp, b, bnorm) ...]
+            costs = [(0, 0, 0, [], 0) for team_number in range(k)]
 
-            best_team, best_sum = G.nodes[v]['team'], float('inf')
-            for team, curr_sum in enumerate(sums):
-                if curr_sum < best_sum:
+            i = G.nodes[u]['team']
+            for j in range(1, k + 1):
+                if i != j:
+                    Cw_j = update_Cw(G, Cw, u, i, j)
+                    b_j = list(b)
+                    Cp_j, b_j, bnorm_j = update_Cp(b_j, bnorm, V, i, j)
+
+                    delta_cost = (Cw_j - Cw) + (Cp_j - Cp)
+                    costs[j - 1] = (delta_cost, Cw_j, Cp_j, b_j, bnorm_j)
+                else: 
+                    costs[j - 1] = (0, Cw, Cp, b, bnorm)
+
+            best_team, best_sum = G.nodes[u]['team'], float('inf')
+            for team in range(k):
+                if costs[team][0] <= best_sum:
                     best_team = team
-                    best_sum = curr_sum
-                    
+                    best_sum = costs[team][0]
+            
             G.nodes[u]['team'] = best_team + 1
-
-    # for _ in range(k, G.number_of_nodes()):
-    #     if len(to_add) == 0: to_add = list(range(k))
-    #     next, team = min((
-    #         min(
-    #             filter(lambda v: not 'team' in G.nodes[v], G.nodes), 
-    #             key=lambda v: G.nodes[v][team] if team in G.nodes[v] else 0), 
-    #         team)
-    #         for team in to_add)
-    #     to_add.remove(team)
-    #     add_to_team(G, teams, next, team)
+            cost, Cw, Cp, b, bnorm = costs[best_team]
 
     return G
 
 def test_on_all_k(G):
     best_score, B = float('inf'), None
 
-    for k in range(10, 13):
+    for k in range(1, get_k_bound(G)):
         print('Now trying k =', k)
-        for _ in range(50):
+        for _ in range(5):
             # curr_score, G_last, Ck, Cw, Cp, b, bnorm = None, None, None, None, None, None, None
             G = solver(G, k, 10)
             curr_score = score(G)
@@ -79,3 +69,4 @@ def test_on_all_k(G):
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
 test_on_input(test_on_all_k, 'student_inputs/small1.in')
+# test_on_input(solver, 'student_inputs/small1.in')
