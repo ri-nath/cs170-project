@@ -2,6 +2,7 @@ from typing import Callable
 
 import itertools
 import networkx as nx
+import random
 
 from starter import *
 from test import *
@@ -15,6 +16,34 @@ from shared import *
 #     return from_vertex
 
 # Adds vertex v to team team, and updates team sums to connected vertices
+def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
+    def from_vertex(v: int) -> int:
+        edges = [G[v][u]['weight'] for u in G.neighbors(v) if u in S]
+        return sum(edges)
+    return from_vertex
+
+def solver(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]) -> nx.Graph:    
+    k = len(sources)
+    teams = [[s] for s in sources]
+    team = 0
+    for u in G.nodes:
+        if u in sources:
+            G.nodes[u]['team'] = team + 1
+            G.nodes[u]['visited'] = True
+            team += 1
+        else:
+            G.nodes[u]['visited'] = False
+    
+    for i in range(k, G.number_of_nodes()):
+        team = i % k
+        not_visited = filter(lambda v: not G.nodes[v]['visited'], G.nodes)
+        next = min(not_visited, key=sum_weights_to_subset(G, teams[team]))
+        G.nodes[next]['team'] = team + 1
+        G.nodes[next]['visited'] = True
+        teams[team].append(next)
+
+    return G
+
 def add_to_team(G: nx.graph, teams: list[list[int]], v: int, team: int):
     G.nodes[v]['team'] = team + 1
     teams[team].append(v)
@@ -24,8 +53,7 @@ def add_to_team(G: nx.graph, teams: list[list[int]], v: int, team: int):
         # Tracks sum from team to u        
         G.nodes[u][team] += G[u][v]['weight']
 
-
-def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:    
+def solver_all_teams(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:    
     k = len(sources)
     teams = [[] for _ in sources]
     to_add = list(range(k))
@@ -47,6 +75,27 @@ def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:
         add_to_team(G, teams, next, team)
 
     return G
+
+def test_random(G, epochs: int = 10):
+    best_score, B = float('inf'), None
+
+    for _ in range(epochs):
+
+        for k in range(1, get_k_bound(G)):
+            lst = sorted(range(G.number_of_nodes()), key=lambda _: random.random())
+            # add_to_team(G, u, i % k)
+            sources = [None for _ in range(k)]
+            for i in range(k):
+                sources[i] = lst[i]
+            res = solver(G, sources)
+            if(score(G) < best_score):
+                best_score = score(G)
+                B = G.copy()
+    return B
+            
+
+            
+    
 
 
 def test_on_all_combinations(G):
@@ -70,5 +119,5 @@ def test_on_all_combinations(G):
     
     return B
 
-test_vs_output(test_on_all_combinations)
+test_on_input( test_random,'student_inputs/small1.in')
 
