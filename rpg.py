@@ -22,9 +22,10 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
     V = G.number_of_nodes()
     best_cost, B = float('inf'), None
     k_list = range(k)
-    count, last_cost = 0, 0
+    count, counter, last_cost = 0, 0, 0
     
-    while count < epochs:
+    while (count < epochs) and (counter < G.number_of_nodes()):
+        counter += 1
         total_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
         last_cost = total_cost
         weights = np.full(k, epsilon)
@@ -81,10 +82,10 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
 
     return B
 
-def test_on_all_k(G, repeats=50, epochs=3):
+def test_on_all_k(G, repeats=20, epochs=3):
     best_score, B = float('inf'), None
 
-    for k in range(7, calculate_k_bound(G)):
+    for k in range(1, calculate_k_bound(G)):
         print('Now trying k =', k, 'Best so far =', best_score)
 
         if calculate_Ck(k) > best_score:
@@ -102,6 +103,6 @@ def test_on_all_k(G, repeats=50, epochs=3):
     return B
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
-test_on_input(test_on_all_k, 'student_inputs/large1.in')
+# test_on_input(test_on_all_k, 'student_inputs/large1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
-# gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
+gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
