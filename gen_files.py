@@ -144,3 +144,19 @@ inputs_to_improve = ['small1', 'small2', 'small3', 'small4', 'small5', 'small7',
 
 #v isualize(read_input('student_inputs/large53.in'))
 # visualize(read_output(read_input('student_inputs/large53.in'), 'rpg_outputs/large53.out'))
+
+def tar_best(destination: str, input: str, outputs: list[str], overwrite=True):
+    for size in ['small', 'medium', 'large']:
+        for n in range(1, 261):
+            G = read_input(f'{input}/{size}{n}.in')
+            read_G = lambda p: read_output(G.copy(), p)
+            solutions = map(lambda p: f'{p}/{size}{n}.out', outputs)
+            solutions = filter(os.path.exists, solutions)
+            solutions = map(read_G, solutions)
+            G = min(solutions, key=score)
+            print(f'Best solution for {size}{n}: {score(G)}')
+            write_output(G, f'{destination}/{size}{n}.out', overwrite=overwrite)
+
+    tar(destination, overwrite=overwrite)
+
+tar_best('out', 'student_inputs', [f'rpg_outputs_{x}' for x in ['a', 'b','c']])
