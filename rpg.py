@@ -23,9 +23,9 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
     V = G.number_of_nodes()
     best_cost, B = float('inf'), None
     k_list = range(k)
-    count, last_cost = 0, 0
-    counter = 0
-    while count < epochs:
+    count, counter, last_cost = 0, 0, 0
+    
+    while (count < epochs) and (counter < G.number_of_nodes()):
         counter += 1
         total_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
         last_cost = total_cost
@@ -86,7 +86,7 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
 def test_on_all_k(G, repeats=50):
     best_score, B = float('inf'), None
 
-    for k in range(2, 3):#calculate_k_bound(G)):
+    for k in range(2, calculate_k_bound(G)):
         print(f'[!!!] Now trying k={k}, with best_score={best_score}...')
         print(f'Note that the lower bound of k={k} is {calculate_Ck(k)}.')
 
@@ -95,7 +95,7 @@ def test_on_all_k(G, repeats=50):
 
         for _ in range(repeats):
             # curr_score, G_last, Ck, Cw, Cp, b, bnorm = None, None, None, None, None, None, None
-            G = solver(G, k=k, epochs=5, epsilon=10, decay=1.005)
+            G = solver(G, k=k, epochs=5, epsilon=1, decay=1.5)
             curr_score = score(G)
             
             if curr_score < best_score:

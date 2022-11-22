@@ -77,9 +77,9 @@ def check_graphs():
 
 ## OUTPUTS (PHASE 2)
 
-def gen_outputs(solver: solver, n: int, in_folder: str, out_folder: str, overwrite: bool = False):
-    for size in ('small', 'medium', 'large'):
-        for n in range(1, 261):
+def gen_outputs(solver: solver, n: int, in_folder: str, out_folder: str, overwrite: bool = False, sizes = ('small', 'medium', 'large'), start = 1, finish = 261):
+    for size in sizes:
+        for n in range(start, finish):
             G = read_input(f'{in_folder}/{size}{n}.in')
             G = solver(G)
             print(f'{size}{n}: {score(G)}')
