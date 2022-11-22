@@ -78,9 +78,15 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) ->
     V = G.number_of_nodes()
     best_cost, B = float('inf'), None
 
-    for _ in range(epochs):
+    count = 0
+    last_cost = 0
+    counter = 0
+    while count < epochs:
+        counter+=1
+        # print("counter:", counter)
+        # print("count:", count)
         total_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
-
+        last_cost = total_cost
         for u in range(G.number_of_nodes()):
             # [... (heuristic, Cw, Cp, b, bnorm) ...]
             costs = [(0, 0, 0, [], 0) for team_number in range(k)]
@@ -107,13 +113,21 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) ->
             delta_cost, Cw, Cp, b, bnorm = costs[best_team]
             
             total_cost += delta_cost
-            if total_cost < best_cost:
-                B = G.copy()
-                best_cost = total_cost
+        if total_cost < best_cost:
+            # print("LOADING COPY")
+            B = G.copy()
+            best_cost = total_cost
+            # print("DONE LOADING")
+
+        if last_cost == total_cost:
+            count += 1
+        else:
+            count = 0
+        
 
     return B
 
-def test_on_all_k(G, repeats=5, epochs=5):
+def test_on_all_k(G, repeats=20, epochs=3):
     best_score, B = float('inf'), None
 
     for k in range(1, calculate_k_bound(G)):
@@ -134,6 +148,6 @@ def test_on_all_k(G, repeats=5, epochs=5):
     return B
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
-# test_on_input(test_on_all_k, 'student_inputs/large1.in')
-test_on_input(solver, 'student_inputs/small1.in')
+test_on_input(test_on_all_k, 'student_inputs/large1.in')
+# test_on_input(solver, 'student_inputs/small1.in')
 # gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
