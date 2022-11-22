@@ -85,6 +85,24 @@ def gen_outputs(solver: solver, n: int, in_folder: str, out_folder: str, overwri
             print(f'{size}{n}: {score(G)}')
             write_output(G, f'{out_folder}/{size}{n}.out', overwrite=overwrite)
 
+def target_output(solver: solver, in_file, out_file):
+    print(f'Targeting {out_file}...')
+
+    G = read_input(in_file)
+    new = solver(G.copy())
+    old = read_output(G.copy(), out_file)
+
+    new_score = score(new)
+    old_score = score(old)
+
+    print(f'New score: {new_score}, Old score: {old_score}')
+    if new_score < old_score:
+        print(f'Saving new score {new_score}...')
+        write_output(new, out_file, overwrite=True)
+        print(f'Saved new score {new_score} to {out_file}!')
+    else:
+        print(f'Keeping old score {old_score}.')
+
 # Import Library
 import requests
 from bs4 import BeautifulSoup
@@ -123,3 +141,6 @@ inputs_to_improve = ['small1', 'small2', 'small3', 'small4', 'small5', 'small7',
 'medium133', 'medium134', 'medium135', 'medium136', 'medium137', 'medium138', 'medium139', 'medium140', 'medium141', 'medium142', 'medium143', 'medium144', 'medium146', 'medium147', 'medium148', 'medium150', 'medium151', 'medium152', 'medium153', 'medium154', 'medium155', 'medium156', 'medium157', 'medium158', 'medium159', 'medium160', 'medium161', 'medium162', 'medium163', 'medium164', 'medium165', 'medium166', 'medium167', 'medium168', 'medium169', 'medium170', 'medium172', 'medium173', 'medium174', 'medium175', 'medium176', 'medium177', 'medium178', 'medium179', 'medium180', 'medium182', 'medium184', 'medium185', 'medium186', 'medium187', 'medium188', 'medium189', 'medium190', 'medium192', 'medium193', 'medium194', 'medium195', 'medium196', 'medium197', 'medium198', 'medium199', 'medium200', 'medium201', 'medium202', 'medium203', 'medium205', 'medium207', 'medium208', 'medium210', 'medium212', 'medium213', 'medium214', 'medium215', 'medium217', 'medium219', 'medium220', 'medium221', 'medium223', 'medium224', 'medium225', 'medium226', 'medium227', 'medium228', 'medium229', 'medium230', 'medium232', 'medium233', 'medium234', 'medium236', 'medium237', 'medium238', 'medium239', 'medium240', 'medium241', 'medium242', 'medium244', 'medium246', 'medium247', 'medium248', 'medium249', 'medium250', 'medium251', 'medium252', 'medium253', 'medium254', 'medium255', 'medium256', 'medium257', 'medium259', 'medium260', 'large1', 'large2', 'large3', 'large4', 'large5', 'large6', 'large7', 'large8', 'large9', 'large10', 'large11', 'large12', 'large13', 'large14', 'large17', 'large18', 'large20', 'large21', 'large22', 'large23', 'large25', 'large26', 'large27', 'large28', 'large29', 'large31', 'large32', 'large33', 'large34', 'large37', 'large38', 'large39', 'large42', 'large44', 'large47', 'large48', 'large49', 'large50', 'large51', 'large52', 'large53', 'large54', 'large55', 'large56', 
 'large57', 'large58', 'large59', 'large60', 'large62', 'large63', 'large64', 'large65', 'large67', 'large68', 'large69', 'large70', 'large72', 'large73', 'large74', 'large76', 'large77', 'large78', 'large80', 'large82', 'large83', 'large84', 'large85', 'rge112', 'large114', 'large117', 'large119', 'large120', 'large122', 'large123', 'large124', 'large126', 'large127', 'large128', 'large129', 'large131', 'large133', 'large135', 'large136', 'large137', 'large138', 'large139', 'large140', 'large141', 'large143', 'large144', 'large145', 'large146', 'large147', 'large149', 'large150', 'large151', 'large152', 'large154', 'large155', 
 'large157', 'large158', 'large159', 'large160', 'large161', 'large162', 'large163', 'large164', 'large165', 'large167', 'large168', 'large169', 'large170', 'large172', 'large173', 'large174', 'large175', 'large176', 'large177', 'large178', 'large179', 'large180', 'large182', 'large184', 'large186', 'large187', 'large188', 'large189', 'large190', 'large192', 'large193', 'large194', 'large195', 'large196', 'large197', 'large198', 'large199', 'large200', 'large201', 'large202', 'large205', 'large206', 'large207', 'large208', 'large209', 'large210', 'large211', 'large212', 'large213', 'large214', 'large215', 'large216', 'large217', 'large218', 'large219', 'large220', 'large221', 'large223', 'large224', 'large225', 'large227', 'large228', 'large229', 'large230', 'large232', 'large233', 'large234', 'large235', 'large236', 'large237', 'large238', 'large239', 'large241', 'large242', 'large244', 'large245', 'large246', 'large247', 'large248', 'large249', 'large250', 'large251', 'large252', 'large253', 'large254', 'large255', 'large257', 'large258', 'large259', 'large260']
+
+#v isualize(read_input('student_inputs/large53.in'))
+# visualize(read_output(read_input('student_inputs/large53.in'), 'rpg_outputs/large53.out'))

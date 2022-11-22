@@ -9,6 +9,7 @@ from starter import *
 from test import *
 from shared import *
 from greedy import *
+from gen_files import *
 
 # Adds vertex v to team team, and updates team sums to connected vertices
 def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, decay: float = 1.5, is_random: bool = True) -> nx.Graph:        
@@ -23,8 +24,9 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
     best_cost, B = float('inf'), None
     k_list = range(k)
     count, last_cost = 0, 0
-    
+    counter = 0
     while count < epochs:
+        counter += 1
         total_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
         last_cost = total_cost
         weights = np.full(k, epsilon)
@@ -78,30 +80,33 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
         else:
             count = 0
         
-
+    print(f'Found local minimum {best_cost} after {counter} iterations.')
     return B
 
-def test_on_all_k(G, repeats=50, epochs=3):
+def test_on_all_k(G, repeats=50):
     best_score, B = float('inf'), None
 
-    for k in range(7, calculate_k_bound(G)):
-        print('Now trying k =', k, 'Best so far =', best_score)
+    for k in range(2, 3):#calculate_k_bound(G)):
+        print(f'[!!!] Now trying k={k}, with best_score={best_score}...')
+        print(f'Note that the lower bound of k={k} is {calculate_Ck(k)}.')
 
         if calculate_Ck(k) > best_score:
                 return B
 
         for _ in range(repeats):
             # curr_score, G_last, Ck, Cw, Cp, b, bnorm = None, None, None, None, None, None, None
-            G = solver(G, k, epochs)
+            G = solver(G, k=k, epochs=5, epsilon=10, decay=1.005)
             curr_score = score(G)
             
             if curr_score < best_score:
                     best_score, B = curr_score, G.copy()
-                    print(k, best_score)         
+                    print(f'[!!] Found a new best score {best_score} with k={k}.')         
     
     return B
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
-test_on_input(test_on_all_k, 'student_inputs/large1.in')
+# test_on_input(test_on_all_k, 'student_inputs/large1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
 # gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
+target = lambda t: target_output(test_on_all_k, f'student_inputs/{t}.in', f'rpg_outputs/{t}.out')
+target('large53')
