@@ -67,7 +67,7 @@ def solver_state_based(G: nx.graph, k: int = 12, epochs: int = 5) -> nx.Graph:
 
 
 # Adds vertex v to team team, and updates team sums to connected vertices
-def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) -> nx.Graph:        
+def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, decay: float = 2, is_random: bool = True) -> nx.Graph:        
     i = 0
     if is_random:
         for u in sorted(range(G.number_of_nodes()), key=lambda _: random.random()):
@@ -78,17 +78,16 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) ->
     V = G.number_of_nodes()
     best_cost, B = float('inf'), None
 
-    count = 0
-    last_cost = 0
-    counter = 0
+    count, last_cost= 0, 0
+    
+
     while count < epochs:
-        counter+=1
-        # print("counter:", counter)
-        # print("count:", count)
         total_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
         last_cost = total_cost
+        weights = [epsilon ** j for j in range(k)]
+
         for u in range(G.number_of_nodes()):
-            # [... (heuristic, Cw, Cp, b, bnorm) ...]
+            # [... (delta_cost, Cw, Cp, b, bnorm) ...]
             costs = [(0, 0, 0, [], 0) for team_number in range(k)]
 
             i = G.nodes[u]['team']
@@ -103,16 +102,26 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) ->
                 else: 
                     costs[j - 1] = (0, Cw, Cp, b, bnorm)
 
-            best_team, best_delta_cost = G.nodes[u]['team'], float('inf')
-            for team in range(k):
-                if costs[team][0] <= best_delta_cost:
-                    best_team = team
-                    best_delta_cost = costs[team][0]
+            # best_team, best_delta_cost = G.nodes[u]['team'], float('inf')
+            # for team in range(k):
+            #     if costs[team][0] <= best_delta_cost:
+            #         best_team = team
+            #         best_delta_cost = costs[team][0]
             
+            # costs array
+            # [... i: (delta_cost, Cw, Cp, b, bnorm) ...]
+            # i = [0, k)
+            # we want to sort i by delta_cost
+            sorted_i = sorted(range(k), key=lambda i: costs[i][0])
+            # weights = [ e ** 0, e ** 1, e ** 2 ... e ** (k - 1)]
+            best_team = random.choices(sorted_i, weights=weights)[0]
+            # print(sorted_i, weights, best_team)
             G.nodes[u]['team'] = best_team + 1
             delta_cost, Cw, Cp, b, bnorm = costs[best_team]
             
             total_cost += delta_cost
+
+        epsilon = epsilon / decay
         if total_cost < best_cost:
             # print("LOADING COPY")
             B = G.copy()
@@ -148,6 +157,6 @@ def test_on_all_k(G, repeats=20, epochs=3):
     return B
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
-test_on_input(test_on_all_k, 'student_inputs/large1.in')
+test_on_input(test_on_all_k, 'student_inputs/small1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
 # gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
