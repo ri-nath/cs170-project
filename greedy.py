@@ -18,11 +18,12 @@ from shared import *
 def add_to_team(G: nx.graph, teams: list[list[int]], v: int, team: int):
     G.nodes[v]['team'] = team + 1
     teams[team].append(v)
-    for v, u, weight in G.edges(v, data='weight'):
+    for u in G.neighbors(v):
         if team not in G.nodes[u]:
             G.nodes[u][team] = 0
         # Tracks sum from team to u        
-        G.nodes[u][team] += weight
+        G.nodes[u][team] += G[u][v]['weight']
+
 
 def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:    
     k = len(sources)
@@ -30,10 +31,9 @@ def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:
     to_add = list(range(k))
 
     team = 0
-    for u in G.nodes:
-        if u in sources:
-            add_to_team(G, teams, u, team)
-            team += 1
+    for u in sources:
+        add_to_team(G, teams, u, team)
+        team += 1
     
     for _ in range(k, G.number_of_nodes()):
         if len(to_add) == 0: to_add = list(range(k))
@@ -48,17 +48,27 @@ def solver(G: nx.graph, sources: list[int] = [40, 10, 20, 30, 0]) -> nx.Graph:
 
     return G
 
+
 def test_on_all_combinations(G):
     best_score, B = float('inf'), None
+
     for k in range(1, get_k_bound(G)):
+        print('Now trying k =', k)
+        curr_score, G_last, Ck, Cw, Cp, b, bnorm = None, None, None, None, None, None, None
+        
         for sources in itertools.combinations(G.nodes, k):
-            G = solver(G, sources)
-            new_score = score(G)
-            if new_score < best_score:
-                best_score, B = new_score, G.copy()
+            # print(sources)
+            D = solver(G.copy(), sources)
+            curr_score, Ck, Cw, Cp, b, bnorm = fast_update_score(G_last, D, Ck, Cw, Cp, b, bnorm)
+            
+            # assert abs(curr_score - score(D)) < 0.000001
+
+            G_last = D
+            if curr_score < best_score:
+                best_score, B = curr_score, D.copy()
                 print(k, best_score)
     
     return B
 
-# test_vs_output(test_on_all_combinations)
+test_vs_output(test_on_all_combinations)
 
