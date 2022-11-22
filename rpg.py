@@ -76,13 +76,12 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) ->
             i += 1
 
     V = G.number_of_nodes()
+    best_cost, B = float('inf'), None
 
     for _ in range(epochs):
-        sum_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
+        total_cost, Ck, Cw, Cp, b, bnorm = fast_update_score(None, G)
 
         for u in range(G.number_of_nodes()):
-            # _, cheapest_team = min((G.nodes[u][team], team) for team in range(k))
-
             # [... (heuristic, Cw, Cp, b, bnorm) ...]
             costs = [(0, 0, 0, [], 0) for team_number in range(k)]
 
@@ -98,16 +97,21 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, is_random: bool = True) ->
                 else: 
                     costs[j - 1] = (0, Cw, Cp, b, bnorm)
 
-            best_team, best_sum = G.nodes[u]['team'], float('inf')
+            best_team, best_delta_cost = G.nodes[u]['team'], float('inf')
             for team in range(k):
-                if costs[team][0] <= best_sum:
+                if costs[team][0] <= best_delta_cost:
                     best_team = team
-                    best_sum = costs[team][0]
+                    best_delta_cost = costs[team][0]
             
             G.nodes[u]['team'] = best_team + 1
-            cost, Cw, Cp, b, bnorm = costs[best_team]
+            delta_cost, Cw, Cp, b, bnorm = costs[best_team]
+            
+            total_cost += delta_cost
+            if total_cost < best_cost:
+                B = G.copy()
+                best_cost = total_cost
 
-    return G
+    return B
 
 def test_on_all_k(G, repeats=5, epochs=5):
     best_score, B = float('inf'), None
@@ -130,6 +134,6 @@ def test_on_all_k(G, repeats=5, epochs=5):
     return B
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
-test_on_input(test_on_all_k, 'student_inputs/large1.in')
-# test_on_input(solver, 'student_inputs/small1.in')
+# test_on_input(test_on_all_k, 'student_inputs/large1.in')
+test_on_input(solver, 'student_inputs/small1.in')
 # gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
