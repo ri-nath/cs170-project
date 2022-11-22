@@ -22,7 +22,7 @@ def sum_weights_to_subset(G: nx.graph, S: list[int]) -> Callable[[int], int]:
         return sum(edges)
     return from_vertex
 
-def solver(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]) -> nx.Graph:    
+def greedy(G: nx.graph, sources: list[int] = [0, 10, 20, 30, 40]) -> nx.Graph:    
     k = len(sources)
     teams = [[s] for s in sources]
     team = 0
@@ -87,15 +87,39 @@ def test_random(G, epochs: int = 10):
             sources = [None for _ in range(k)]
             for i in range(k):
                 sources[i] = lst[i]
-            res = solver(G, sources)
-            if(score(G) < best_score):
-                best_score = score(G)
-                B = G.copy()
+            res = greedy(G, sources)
+            if(score(res) < best_score):
+                best_score = score(res)
+                B = res.copy()
     return B
             
 
             
-    
+# def random_for_swap(G, k, epochs: int = 1):
+#     lst = sorted(range(G.number_of_nodes()), key=lambda _: random.random())
+#     # add_to_team(G, u, i % k)
+#     sources = [None for _ in range(k)]
+#     for i in range(k):
+#         sources[i] = lst[i]
+#     res = greedy(G, sources)
+#     return res.copy()
+
+def random_for_swap(G, k, epochs: int = 1):   
+    best_score, B = float('inf'), None
+
+    for _ in range(epochs):
+
+        lst = sorted(range(G.number_of_nodes()), key=lambda _: random.random())
+        # add_to_team(G, u, i % k)
+        sources = [None for _ in range(k)]
+        for i in range(k):
+            sources[i] = lst[i]
+        res = greedy(G, sources)
+        if(score(res) < best_score):
+            best_score = score(res)
+            B = res.copy()
+    return B
+
 
 
 def test_on_all_combinations(G):
@@ -107,7 +131,7 @@ def test_on_all_combinations(G):
         
         for sources in itertools.combinations(G.nodes, k):
             # print(sources)
-            D = solver(G.copy(), sources)
+            D = greedy(G.copy(), sources)
             curr_score, Ck, Cw, Cp, b, bnorm = fast_update_score(G_last, D, Ck, Cw, Cp, b, bnorm)
             
             # assert abs(curr_score - score(D)) < 0.000001
@@ -119,5 +143,5 @@ def test_on_all_combinations(G):
     
     return B
 
-test_on_input( test_random,'student_inputs/small1.in')
+# test_on_input( test_random,'student_inputs/small40.in')
 
