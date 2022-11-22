@@ -18,6 +18,15 @@ def test_vs_output(solver: solver, in_file: str = EXAMPLE_IN, out_file: str = EX
     print(f'Score of {out_file} on {in_file}:', ' + '.join(map(str, optimal_score)), '=', sum(optimal_score))
     visualize(solved)
 
+def test_on_input(solver: solver, in_file: str = EXAMPLE_IN):
+    G = read_input(in_file)
+
+    solved = solver(G.copy())
+
+    solved_score = score(solved, separated=True)
+    print(f'Score of solver on {in_file}:', ' + '.join(map(str, solved_score)), '=', sum(solved_score))
+    visualize(solved)
+
 def test_on_graph(solver: solver, G: nx.Graph):
     solved = solver(G)
     solved_score = score(solved, separated=True)
