@@ -43,10 +43,3 @@ def test_on_simple_graph(solver: solver, weight: int = 100, width: int = 3, heig
 
     test_on_graph(solver, G)
 
-def gen_outputs(solver: solver, n: int, in_folder: str, out_folder: str, overwrite: bool = False):
-    for size in ('small', 'medium', 'large'):
-        for n in range(1, 261):
-            G = read_input(f'{in_folder}/{size}{n}.in')
-            G = solver(G)
-            print(f'{size}{n}: {score(G)}')
-            write_output(G, f'{out_folder}/{size}{n}.out', overwrite=overwrite)
