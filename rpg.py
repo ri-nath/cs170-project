@@ -55,18 +55,17 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5) -> nx.Graph:
 def test_on_all_k(G, repeats=5, epochs=5):
     best_score, B = float('inf'), None
 
-    for k in range(1, get_k_bound(G)):
-        # print('Now trying k =', k, 'Best so far =', best_score)
+    for k in range(1, calculate_k_bound(G)):
+        print('Now trying k =', k, 'Best so far =', best_score)
+
+        if calculate_Ck(k) > best_score:
+                return B
+
         for _ in range(repeats):
             # curr_score, G_last, Ck, Cw, Cp, b, bnorm = None, None, None, None, None, None, None
             G = solver(G, k, epochs)
-            Cw, Ck, Cp = score(G, separated=True)
-
-            if Ck > best_score:
-                return B
-
-            curr_score = Cw + Ck + Cp
-
+            curr_score = score(G)
+            
             if curr_score < best_score:
                     best_score, B = curr_score, G.copy()
                     # print(k, best_score)         
@@ -74,6 +73,6 @@ def test_on_all_k(G, repeats=5, epochs=5):
     return B
 
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
-# test_on_input(test_on_all_k, 'student_inputs/large1.in')
+test_on_input(test_on_all_k, 'student_inputs/large1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
-gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
+# gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
