@@ -42,11 +42,3 @@ def test_on_simple_graph(solver: solver, weight: int = 100, width: int = 3, heig
             G.add_edge(i, i + 1, weight=weight)
 
     test_on_graph(solver, G)
-
-def gen_outputs(solver: solver, n: int, in_folder: str, out_folder: str, overwrite: bool = False, sizes = ('small', 'medium', 'large'), start = 1, finish = 261):
-    for size in sizes:
-        for n in range(start, finish):
-            G = read_input(f'{in_folder}/{size}{n}.in')
-            G = solver(G)
-            print(f'{size}{n}: {score(G)}')
-            write_output(G, f'{out_folder}/{size}{n}.out', overwrite=overwrite)
