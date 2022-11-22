@@ -26,10 +26,6 @@ def update_Cp(b: np.array, bnorm: float, V: int, i: int, j: int) -> tuple[float,
     i = i - 1
     j = j - 1
 
-    z = np.array(list(b))
-    z[i] -= 1 / V
-    z[j] += 1 / V
-    # print(b, z, bnorm, i, j)
     try:
         bnorm = math.sqrt(
             bnorm ** 2 - b[i] ** 2 - b[j] ** 2 
@@ -58,8 +54,8 @@ def update_Cw(G: nx.graph, Cw: int, v: int, i: int, j: int):
     return Cw
 
 def fast_update_score(G: nx.graph, D: nx.graph, 
-                      Ck: float, Cw: float, Cp: float, 
-                      b: np.array, bnorm: float) -> tuple[float, float, float, float, np.array, float]:
+                      Ck: float = None, Cw: float = None, Cp: float = None, 
+                      b: np.array = None, bnorm: float = None) -> tuple[float, float, float, float, np.array, float]:
     if not Ck:
         return first_update_score(D)
 
