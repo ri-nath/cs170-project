@@ -159,4 +159,5 @@ def tar_best(destination: str, input: str, outputs: list[str], overwrite=True):
 
     tar(destination, overwrite=overwrite)
 
-tar_best('out', 'student_inputs', [f'rpg_outputs_{x}' for x in ['a', 'b','c']])
+if __name__ == '__main__':
+    tar_best('out', 'student_inputs', [f'rpg_outputs_{x}' for x in ['a', 'b','c']])
