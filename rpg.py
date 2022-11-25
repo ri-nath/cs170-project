@@ -9,6 +9,7 @@ from starter import *
 from test import *
 from shared import *
 from greedy import *
+from gen_files import *
 
 # Adds vertex v to team team, and updates team sums to connected vertices
 def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, decay: float = 1.5, is_random: bool = True) -> nx.Graph:        
@@ -105,4 +106,4 @@ def test_on_all_k(G, repeats=20, epochs=3):
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
 # test_on_input(test_on_all_k, 'student_inputs/large1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
-gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs')
+gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs', sizes=('large'))
