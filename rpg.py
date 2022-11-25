@@ -37,7 +37,6 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
         weights = np.full(k, epsilon)
         weights = np.power(weights, range(k))
 
-        assert abs(total_cost - score(G)) < 0.01
         last_cost = total_cost
         
         # For every vertex u, move u to a better team with high probability, 
