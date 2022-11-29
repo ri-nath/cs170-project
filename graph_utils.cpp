@@ -86,13 +86,19 @@ void add_edge(graph_t *G, int32_t source, int32_t target, int32_t weight){
 
 void free_graph(graph_t* G){
     for(int32_t i = 0; i < G->num_nodes; i++){
-        printf("freeing node %i's neighbors\n", i);
+        // printf("freeing node %i's neighbors\n", i);
         free(G->nodes[i].neighbors);
     }
-    printf("freeing nodes\n");
-    free(G->nodes);
-    printf("freeing graph\n");
-    free(G);
+    try{
+        printf("freeing nodes\n");
+        free(G->nodes);
+        printf("freeing graph\n");
+    
+        free(G);
+    }catch(...){
+        std::cout << "found an exception";
+        // std::cerr << exc.what();
+    }
     printf("successfully freed graph\n");
 }
 

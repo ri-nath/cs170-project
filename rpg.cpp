@@ -50,8 +50,8 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
         scramble.pop_back();
         G->nodes[curr].team = i%k;
     }
-    printf("Initial Scramble done\n");
-    printf("k=%i\n", k);
+    // printf("Initial Scramble done\n");
+    // printf("k=%i\n", k);
     double best_cost = std::numeric_limits<double>::infinity();
     graph_t *B = NULL;
     int32_t k_list[k];
@@ -59,13 +59,13 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     int32_t count = 0;
     int32_t counter = 0;
     double last_cost = 0;
-    printf("First update start\n");
+    // printf("First update start\n");
     printf("k=%i\n", k);
     auto[total_cost, ck, cw, cp, bnorm, b] = first_update_score(G);
-    printf("first update done\n");
+    // printf("first update done\n");
     double weights[k];
     // std::tuple<double, double, double, double, double*>
-    printf("Declared cost creation\n");
+    // printf("Declared cost creation\n");
     // std::vector<std::vector<double>> cost;
     // printf("Starting cost Initialization\n");
     // for(int i = 0; i < k; i ++){
@@ -73,9 +73,9 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     //     cost.push_back(std::vector<double>(5));
     // }
     double cost[k][5];
-    printf("Starting While\n");
+    // printf("Starting While\n");
     while((count < stale) && (counter < G->num_nodes*10)){
-        printf("Started While\n");
+        // printf("Started While\n");
         counter++;
         
         for(int i = 0; i < k; i++){
