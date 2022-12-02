@@ -19,7 +19,7 @@
 
 //helper function declerations
 double norm(double *array, size_t length);
-int32_t update_cw(graph_t *G, int32_t cw, int32_t u, int32_t i, int32_t j);
+double update_cw(graph_t *G, double cw, int32_t u, int32_t i, int32_t j);
 double* update_b(double *b, int32_t v, int32_t i, int32_t j);
 std::tuple<double, double> update_cp(double *b, double bnorm, int32_t v, int32_t i, int32_t j);
 double calculate_ck(int32_t k);
@@ -123,19 +123,34 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
             double rnd = (double)rand()/(RAND_MAX/sum);
             // printf("RANDOM: %f\n", rnd);
             int32_t best_team = 0;
-            for(int32_t i = 0; i < k; i++){
+            for(int32_t i = 0; (i < k) && rnd > 0; i++){
                 rnd -= weights[i];
-                if(rnd <= 0){
-                    best_team = (int32_t) cost[i][4];
-                    break;
-                }
+                best_team = (int32_t) cost[i][4];
             }
             // int32_t best_team = cost[0][4];
 
             G->nodes[u].team = best_team;
 
-            best_team = 0;
             total_cost += cost[best_team][0];
+            auto real_cost = first_update_score(G);
+            
+            // printf("total_cost = %f, should be = %f\n", total_cost, std::get<0>(real_cost));
+            if(abs(std::get<0>(real_cost)- total_cost) > 0.01){
+                printf("==============================\n");
+                printf("total_cost = %f, should be = %f\n", total_cost, std::get<0>(real_cost));
+                if(abs(std::get<2>(real_cost) - cost[best_team][1]) > 0.01){
+                    printf("bad cw is: %f, should be: %f\n", cost[best_team][1], std::get<2>(real_cost));
+                }
+                if(abs(std::get<3>(real_cost) - cost[best_team][2]) > 0.01){
+                    printf("bad cp is: %f, should be: %f\n", cost[best_team][2], std::get<3>(real_cost));
+                }
+                if(abs(std::get<4>(real_cost) - cost[best_team][3]) > 0.01){
+                    printf("bad bnorm is: %f, should be: %f\n", cost[best_team][3], std::get<4>(real_cost));
+                }
+
+            }
+            
+
             cw = cost[best_team][1];
             cp = cost[best_team][2];
             bnorm = cost[best_team][3];
@@ -195,6 +210,8 @@ std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
             auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
             // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
             // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
+            auto real_cost = first_update_score(G_new);
+            printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
             if(curr_score < best_score){
                 best_score = curr_score;
                 B = copy(G_new);
@@ -247,12 +264,12 @@ std::tuple<double, double> update_cp(double *b, double bnorm, int32_t v, int32_t
 }
 
 double* update_b(double *b, int32_t v, int32_t i, int32_t j){
-    b[i] -= 1/v;
-    b[j] += 1/v;
+    b[i] -= (double)1/v;
+    b[j] += (double)1/v;
     return b;
 }
 
-int32_t update_cw(graph_t *G, int32_t cw, int32_t u, int32_t i, int32_t j){
+double update_cw(graph_t *G, double cw, int32_t u, int32_t i, int32_t j){
     for(int32_t i = 0; i < G->nodes[u].num_neighbors; i++){
         int32_t v = G->nodes[u].neighbors[i].target;
         if(G->nodes[v].team == i){
