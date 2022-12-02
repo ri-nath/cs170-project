@@ -14,14 +14,15 @@ typedef struct edge_t {
 typedef struct node_t {
     int32_t team;
     edge_t *neighbors;
-    size_t max_neighbors;
+    int32_t max_neighbors;
     int32_t num_neighbors;
     
 } node_t;
 
 typedef struct graph_t {
-    size_t num_nodes;
-    size_t num_edges;
+    int32_t num_nodes;
+    int32_t num_edges;
+    int64_t sum_weights;
     node_t *nodes;
 } graph_t;
 

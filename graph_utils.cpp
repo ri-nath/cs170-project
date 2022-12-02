@@ -21,6 +21,7 @@ graph_t* read_input(const char *path, int32_t size){
     graph_t *G = (graph_t*) calloc(1, sizeof(graph_t));
     G->nodes = (node_t*) calloc(size, sizeof(node_t));
     G->num_nodes = size;
+    G->sum_weights = 0;
     for(int32_t i = 0; i < size; i++){
         G->nodes[i].neighbors = (edge_t*) calloc(8, sizeof(edge_t));
         G->nodes[i].max_neighbors = 8;
@@ -31,6 +32,7 @@ graph_t* read_input(const char *path, int32_t size){
     for (int32_t i = 0; i < dat.size(); i++) {
         json curr = dat.at(i);
         // printf("FROM: %d, TO: %d, WEIGHT: %d\n", (int32_t)curr["source"], (int32_t)curr["target"], (int32_t)curr["weight"]);
+        G->sum_weights += (int32_t)curr["weight"];
         add_edge(G, (int32_t)curr["source"], (int32_t)curr["target"], (int32_t)curr["weight"]);
         G->num_edges++;
     }
@@ -46,6 +48,7 @@ void gen_outputs(graph_t* (*solver)(graph_t*, int32_t, bool), const char *in, co
 
 void write_output(graph_t *G, const char *path){
     FILE *f;
+    f = fopen(path, "w");
     fprintf(f, "[");
     for(int i = 0; i < G->num_nodes - 1; i++){
         fprintf(f, "%d, ", G->nodes[i].team+1);
@@ -90,28 +93,39 @@ void free_graph(graph_t* G){
         free(G->nodes[i].neighbors);
     }
     try{
-        printf("freeing nodes\n");
+        // printf("freeing nodes\n");
         free(G->nodes);
-        printf("freeing graph\n");
+        // printf("freeing graph\n");
     
-        free(G);
+        // free(G);
     }catch(...){
         std::cout << "found an exception";
         // std::cerr << exc.what();
     }
-    printf("successfully freed graph\n");
+    // printf("successfully freed graph\n");
 }
 
 graph_t* copy(graph_t* G){
-    graph_t *B = (graph_t*) calloc(1, sizeof(graph_t));
+    // printf("in copy\n");
+    graph_t *B = (graph_t*) malloc(sizeof(graph_t));
+    if(B==NULL)                     
+    {
+        printf("Error! memory not allocated.");
+        exit(0);
+    }
+    // printf("finished B\n");
     B->nodes = (node_t*) calloc(G->num_nodes, sizeof(node_t));
+    // printf("finished B->nodes\n");
     B->num_nodes = G->num_nodes;
     B->num_edges = G->num_edges;
+    B->sum_weights = G->sum_weights;
+    // printf("finished B and bnodes\n");
     for(int32_t i = 0; i < G->num_nodes; i++){
         B->nodes[i].neighbors = (edge_t*) calloc(G->nodes[i].max_neighbors, sizeof(edge_t));
         B->nodes[i].max_neighbors = G->nodes[i].max_neighbors;
         B->nodes[i].team = G->nodes[i].team;
     }
+    // printf("initialized nodes and declared neighbors\n");
     for(int32_t i = 0; i < G->num_nodes; i++){
         for(int32_t j = 0; j < G->nodes[i].num_neighbors; j++){
             if(G->nodes[i].neighbors[j].target > i){
@@ -119,5 +133,6 @@ graph_t* copy(graph_t* G){
             }
         }
     }
+    // printf("added edges\n");
     return B;
 }

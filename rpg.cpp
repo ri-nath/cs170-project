@@ -36,9 +36,9 @@ decay is what scales epsilon each timestep.
 std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double epsilon, double decay){
     
     //assigns random teams to the vertices
-    printf("STARTED SOLVER on %d nodes\n", G->num_nodes);
-    printf("k=%i\n", k);
-    std::vector<int32_t> scramble(100);
+    // printf("STARTED SOLVER on %d nodes\n", G->num_nodes);
+    // printf("k=%i\n", k);
+    std::vector<int32_t> scramble(G->num_nodes);
     for (int32_t i = 0; i < G->num_nodes; i++){
         // printf("pushing scramble %d", i);
         scramble[i] = i;
@@ -60,7 +60,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     int32_t counter = 0;
     double last_cost = 0;
     // printf("First update start\n");
-    printf("k=%i\n", k);
+    // printf("k=%i\n", k);
     auto[total_cost, ck, cw, cp, bnorm, b] = first_update_score(G);
     // printf("first update done\n");
     double weights[k];
@@ -105,6 +105,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
                 }
                 
             }
+            // printf("Started sort\n");
 
             // std::sort(cost.begin(), cost.end(), compare_cost);
             std::qsort(cost, k, sizeof(double)*5,
@@ -119,17 +120,17 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
                 sum += weights[i];
             }
             
-            // double rnd = (double)rand()/(RAND_MAX/sum);
-            // // printf("RANDOM: %f\n", rnd);
-            // int32_t best_team = 0;
-            // for(int32_t i = 0; i < k; i++){
-            //     rnd -= weights[i];
-            //     if(rnd <= 0){
-            //         best_team = (int32_t) cost[i][4];
-            //         break;
-            //     }
-            // }
-            int32_t best_team = cost[0][4];
+            double rnd = (double)rand()/(RAND_MAX/sum);
+            // printf("RANDOM: %f\n", rnd);
+            int32_t best_team = 0;
+            for(int32_t i = 0; i < k; i++){
+                rnd -= weights[i];
+                if(rnd <= 0){
+                    best_team = (int32_t) cost[i][4];
+                    break;
+                }
+            }
+            // int32_t best_team = cost[0][4];
 
             G->nodes[u].team = best_team;
 
@@ -142,15 +143,17 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
             // printf("count %d\n", count);
             // printf("counter %d\n", counter);
         }
+        // printf("finished nodes\n");
 
         epsilon = epsilon/decay;
 
         if(total_cost < best_cost){
             if(B != NULL){
-                printf("freeing B\n");
+                // printf("freeing B\n");
                 free_graph(B);
-                printf("finished freeing B\n");
+                // printf("finished freeing B\n");
             }
+            // printf("making copy\n");
             B = copy(G);
             best_cost = total_cost;
         }
@@ -162,8 +165,9 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
         }
 
     }
-    printf("count %d\n", count);
-    printf("counter %d\n", counter);
+    // printf("count %d\n", count);
+    // printf("counter %d\n", counter);
+    free(b);
     return {B, best_cost};
 }
 
@@ -174,6 +178,7 @@ std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
     printf("Note that the k bound is %i.\n",bound);
     
     for(int k = 1; k < bound; k++){
+        
         double lower_bound = calculate_ck(k) + 1.0;
         if(verbose){
             printf("===========================================================\n");
@@ -184,22 +189,23 @@ std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
         if(lower_bound > best_score){
             return {B, best_score};
         }
-        printf("Graph number of nodes in test_on_all_k = %d\n", G->num_nodes);
+        // printf("Graph number of nodes in test_on_all_k = %d\n", G->num_nodes);
         for(int i = 0; i < repeats; i++){
-            printf("k=%i\n", k);
+            // printf("k=%i\n", k);
             auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
-            printf("Graph number of nodes after solver = %d\n", G->num_nodes);
+            // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
+            // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
             if(curr_score < best_score){
                 best_score = curr_score;
                 B = copy(G_new);
                 
                 if(verbose){
-                    printf("Found a new best score %f with k= %i.\n", best_score, k);
+                    // printf("Found a new best score %f with k= %i.\n", best_score, k);
                 }
             }
-            printf("freeing G_new with %i num of nodes\n", G_new->num_nodes);
+            // printf("freeing G_new with %i num of nodes\n", G_new->num_nodes);
             free_graph(G_new);
-            printf("finished freeing G_new\n");
+            // printf("finished freeing G_new\n");
         }
         
     }
@@ -213,7 +219,8 @@ bool compare_cost(const std::vector<double>& v1, const std::vector<double>& v2){
 
 
 int32_t calculate_k_bound(graph_t *G){
-    return (int32_t) (2 * log((G->num_edges/100) + sqrt(exp(1))));
+    double bound = (2 * log((G->sum_weights/100) + 1.6487212707));
+    return (int32_t) bound;
 }
 
 double calculate_ck(int32_t k){
@@ -307,7 +314,7 @@ std::tuple<double, double, double, double, double, double*> first_update_score(g
             max = counts[G->nodes[i].team];
         }
     }
-    double *b = (double *) calloc(k, sizeof(int32_t));
+    double *b = (double *) calloc(k, sizeof(double));
     for(int32_t i = 0; i < k; i++){
         b[i] =  ((double)counts[i] /G->num_nodes) - ((double)1/k);
     }

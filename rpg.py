@@ -121,4 +121,5 @@ def test_on_all_k(G, repeats=5, verbose=True):
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
 # test_on_input(test_on_all_k, 'student_inputs/large1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
-gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs', sizes=('large'))
+# gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs', sizes=('large'))
+print(score(read_output(read_input("student_inputs/small1.in"), "good_small1.out")))

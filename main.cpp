@@ -13,10 +13,10 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    graph_t *G = read_input("student_inputs/small1.in", 100);
-    printf("Graph number of nodes%d\n", G->num_nodes);
+    srand(time(0));
+    graph_t *G = read_input("student_inputs/medium1.in", 300);
     auto[B, score] = test_on_all_k(G, 5, true);
-    printf("FINAL SCORE OF %d\n", score);
+    printf("FINAL SCORE OF %f\n", score);
     write_output(B, "test.out");
     // double sum = 0;
     // double weights[5] = {2, 1, 1, 1, 1};
@@ -42,6 +42,6 @@ int main(int argc, char* argv[]) {
     // printf("HELLPPP");
 
 
-    // free_graph(G);
+    free_graph(B);
 
 }
