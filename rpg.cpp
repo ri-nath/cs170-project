@@ -26,6 +26,10 @@ double calculate_ck(int32_t k);
 int32_t calculate_k_bound(graph_t *G);
 bool compare_cost(const std::vector<double>& v1, const std::vector<double>& v2);
 
+int myisnan(double x) {
+  return std::isnan(x);
+}
+
 /*
 G is a graph
 K is the number of teams
@@ -157,20 +161,22 @@ std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
             cp = cost[best_index][2];
             bnorm = cost[best_index][3];
             b = update_b(b, G->num_nodes, i, best_team);
-            printf("count %d\n", count);
-            printf("counter %d\n", counter);
+            
         }
+        printf("count %d\n", count);
+        printf("counter %d\n", counter);
         // printf("finished nodes\n");
 
         epsilon = epsilon/decay;
-
+        printf("total cost = %f, best cost = %f", total_cost, best_cost);
         if(total_cost < best_cost){
+
             if(B != NULL){
                 // printf("freeing B\n");
                 free(B);
                 // printf("finished freeing B\n");
             }
-            // printf("making copy\n");
+            printf("making copy of B\n");
             B = copy_teams(G);
             best_cost = total_cost;
         }
@@ -260,8 +266,7 @@ returns cp, bnorm
 */
 std::tuple<double, double> update_cp(double *b, double bnorm, int32_t v, int32_t i, int32_t j){
     // have this only update bnorm and cp then I can do b after finding the best one
-    bnorm = sqrt(pow(bnorm, 2) - pow(b[i], 2) - pow(b[j], 2)
-        + pow(b[i] - (double)1/v, 2) + pow(b[j] + (double)1/v, 2)); 
+    bnorm = sqrt(pow(bnorm, 2) - pow(b[i], 2) - pow(b[j], 2) + pow(b[i] - (double)1/v, 2) + pow(b[j] + (double)1/v, 2)); 
     // b_new[i] -= 1/v;
     // b_new[j] += 1/v;
 
