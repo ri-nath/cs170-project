@@ -134,7 +134,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
             G->nodes[u].team = best_team;
 
             total_cost += cost[best_index][0];
-            auto real_cost = first_update_score(G);
+            // auto real_cost = first_update_score(G);
             
             // printf("total_cost = %f, should be = %f\n", total_cost, std::get<0>(real_cost));
             // if(abs(std::get<0>(real_cost)- total_cost) > 0.01){
@@ -212,8 +212,8 @@ std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
             auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
             // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
             // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
-            auto real_cost = first_update_score(G_new);
-            printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
+            // auto real_cost = first_update_score(G_new);
+            // printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
             if(curr_score < best_score){
                 best_score = curr_score;
                 B = copy(G_new);
