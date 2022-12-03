@@ -33,7 +33,7 @@ stale is the number of times the graph has to be unchanged to terminate
 epsilon is the weight multiplier
 decay is what scales epsilon each timestep.
 */
-std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double epsilon, double decay){
+std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double epsilon, double decay){
     
     //assigns random teams to the vertices
     // printf("STARTED SOLVER on %d nodes\n", G->num_nodes);
@@ -188,9 +188,9 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     return {B, best_cost};
 }
 
-std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool verbose){
+std::tuple<int32_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool verbose){
     double best_score = std::numeric_limits<double>::infinity();
-    graph_t *B = NULL;
+    int32_t *B = NULL;
     int32_t bound = calculate_k_bound(G);
     printf("Note that the k bound is %i.\n",bound);
     
@@ -212,11 +212,11 @@ std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
             auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
             // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
             // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
-            auto real_cost = first_update_score(G_new);
-            printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
+            // auto real_cost = first_update_score(G_new);
+            // printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
             if(curr_score < best_score){
                 best_score = curr_score;
-                B = copy(G_new);
+                B = copy_teams(G_new);
                 
                 if(verbose){
                     // printf("Found a new best score %f with k= %i.\n", best_score, k);
@@ -289,7 +289,7 @@ double update_cw(graph_t *G, double cw, int32_t u, int32_t i, int32_t j){
 //return is cost, ck, cw, cp, bnorm, b
 std::tuple<double, double, double, double, double, double*> first_update_score(graph_t *G){
     int32_t k = 0;
-    int32_t counts[20] = {0};
+    int32_t counts[25] = {0};
     int32_t max;
     for(int32_t i = 0; i < G->num_nodes; i++){
         if(counts[G->nodes[i].team] == 0){
