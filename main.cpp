@@ -15,7 +15,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
     srand(time(0));
     graph_t *G = read_input("student_inputs/medium1.in", 300);
-    auto[B, score] = test_on_all_k(G, 5, true);
+    auto[B, score] = test_on_all_k(G, 1, true);
     printf("FINAL SCORE OF %f\n", score);
     write_output(B, "test.out");
     // double sum = 0;
