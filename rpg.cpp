@@ -36,11 +36,11 @@ decay is what scales epsilon each timestep.
 std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double epsilon, double decay){
     
     //assigns random teams to the vertices
-    // printf("STARTED SOLVER on %d nodes\n", G->num_nodes);
+    printf("STARTED SOLVER on %d nodes\n", G->num_nodes);
     // printf("k=%i\n", k);
     std::vector<int32_t> scramble(G->num_nodes);
     for (int32_t i = 0; i < G->num_nodes; i++){
-        // printf("pushing scramble %d", i);
+        // printf("pushing scramble %d\n", i);
         scramble[i] = i;
     }
     std::random_shuffle(scramble.begin(), scramble.end());
@@ -50,7 +50,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
         scramble.pop_back();
         G->nodes[curr].team = i%k;
     }
-    // printf("Initial Scramble done\n");
+    printf("Initial Scramble done\n");
     // printf("k=%i\n", k);
     double best_cost = std::numeric_limits<double>::infinity();
     graph_t *B = NULL;
@@ -59,10 +59,10 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     int32_t count = 0;
     int32_t counter = 0;
     double last_cost = 0;
-    // printf("First update start\n");
+    printf("First update start\n");
     // printf("k=%i\n", k);
     auto[total_cost, ck, cw, cp, bnorm, b] = first_update_score(G);
-    // printf("first update done\n");
+    printf("first update done\n");
     double weights[k];
     // std::tuple<double, double, double, double, double*>
     // printf("Declared cost creation\n");
@@ -73,7 +73,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     //     cost.push_back(std::vector<double>(5));
     // }
     double cost[k][5];
-    // printf("Starting While\n");
+    printf("Starting While\n");
     while((count < stale) && (counter < G->num_nodes)){
         // printf("Started While\n");
         counter++;
@@ -105,7 +105,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
                 }
                 
             }
-            // printf("Started sort\n");
+            printf("Started sort\n");
 
             // std::sort(cost.begin(), cost.end(), compare_cost);
             std::qsort(cost, k, sizeof(double)*5,
@@ -156,7 +156,9 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
             cw = cost[best_index][1];
             cp = cost[best_index][2];
             bnorm = cost[best_index][3];
+            printf("Updating b\n");
             b = update_b(b, G->num_nodes, i, best_team);
+            printf("Updated b\n");
             // printf("count %d\n", count);
             // printf("counter %d\n", counter);
         }
@@ -166,12 +168,13 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
 
         if(total_cost < best_cost){
             if(B != NULL){
-                // printf("freeing B\n");
+                printf("freeing B\n");
                 free_graph(B);
-                // printf("finished freeing B\n");
+                printf("finished freeing B\n");
             }
-            // printf("making copy\n");
+            printf("making copy of B\n");
             B = copy(G);
+            printf("made copy\n");
             best_cost = total_cost;
         }
 
@@ -183,8 +186,9 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
 
     }
     // printf("count %d\n", count);
-    // printf("counter %d\n", counter);
+    printf("best_cost %f\n", best_cost);
     free(b);
+    printf("freed b\n");
     return {B, best_cost};
 }
 
@@ -211,20 +215,21 @@ std::tuple<graph_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
             // printf("k=%i\n", k);
             auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
             // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
-            // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
+            printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
             // auto real_cost = first_update_score(G_new);
             // printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
             if(curr_score < best_score){
                 best_score = curr_score;
+                printf("making copy of G_new\n");
                 B = copy(G_new);
-                
+                printf("made copy of G_new\n");
                 if(verbose){
-                    // printf("Found a new best score %f with k= %i.\n", best_score, k);
+                    printf("Found a new best score %f with k= %i.\n", best_score, k);
                 }
             }
-            // printf("freeing G_new with %i num of nodes\n", G_new->num_nodes);
+            printf("freeing G_new\n");
             free_graph(G_new);
-            // printf("finished freeing G_new\n");
+            printf("finished freeing G_new\n");
         }
         
     }

@@ -119,16 +119,11 @@ void free_graph(graph_t* G){
         // printf("freeing node %i's neighbors\n", i);
         free(G->nodes[i].neighbors);
     }
-    try{
-        // printf("freeing nodes\n");
-        free(G->nodes);
-        // printf("freeing graph\n");
-    
-        // free(G);
-    }catch(...){
-        std::cout << "found an exception";
-        // std::cerr << exc.what();
-    }
+    // printf("freeing nodes\n");
+    free(G->nodes);
+    // printf("freeing graph\n");
+
+    free(G);
     // printf("successfully freed graph\n");
 }
 
