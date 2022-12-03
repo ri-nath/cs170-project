@@ -74,7 +74,7 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     // }
     double cost[k][5];
     // printf("Starting While\n");
-    while((count < stale) && (counter < G->num_nodes*10)){
+    while((count < stale) && (counter < G->num_nodes)){
         // printf("Started While\n");
         counter++;
         
@@ -137,20 +137,20 @@ std::tuple<graph_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
             auto real_cost = first_update_score(G);
             
             // printf("total_cost = %f, should be = %f\n", total_cost, std::get<0>(real_cost));
-            if(abs(std::get<0>(real_cost)- total_cost) > 0.01){
-                printf("==============================\n");
-                printf("total_cost = %f, should be = %f\n", total_cost, std::get<0>(real_cost));
-                if(abs(std::get<2>(real_cost) - cost[best_index][1]) > 0.01){
-                    printf("bad cw is: %f, should be: %f\n", cost[best_index][1], std::get<2>(real_cost));
-                }
-                if(abs(std::get<3>(real_cost) - cost[best_index][2]) > 0.01){
-                    printf("bad cp is: %f, should be: %f\n", cost[best_index][2], std::get<3>(real_cost));
-                }
-                if(abs(std::get<4>(real_cost) - cost[best_index][3]) > 0.01){
-                    printf("bad bnorm is: %f, should be: %f\n", cost[best_index][3], std::get<4>(real_cost));
-                }
+            // if(abs(std::get<0>(real_cost)- total_cost) > 0.01){
+            //     printf("==============================\n");
+            //     printf("total_cost = %f, should be = %f\n", total_cost, std::get<0>(real_cost));
+            //     if(abs(std::get<2>(real_cost) - cost[best_index][1]) > 0.01){
+            //         printf("bad cw is: %f, should be: %f\n", cost[best_index][1], std::get<2>(real_cost));
+            //     }
+            //     if(abs(std::get<3>(real_cost) - cost[best_index][2]) > 0.01){
+            //         printf("bad cp is: %f, should be: %f\n", cost[best_index][2], std::get<3>(real_cost));
+            //     }
+            //     if(abs(std::get<4>(real_cost) - cost[best_index][3]) > 0.01){
+            //         printf("bad bnorm is: %f, should be: %f\n", cost[best_index][3], std::get<4>(real_cost));
+            //     }
 
-            }
+            // }
             
 
             cw = cost[best_index][1];
@@ -272,53 +272,19 @@ double* update_b(double *b, int32_t v, int32_t i, int32_t j){
 }
 
 double update_cw(graph_t *G, double cw, int32_t u, int32_t i, int32_t j){
+    double delta = 0;
     if(i == j) return cw;
-    for(int32_t i = 0; i < G->nodes[u].num_neighbors; i++){
-        int32_t v = G->nodes[u].neighbors[i].target;
+    for(int32_t n = 0; n < G->nodes[u].num_neighbors; n++){
+        int32_t v = G->nodes[u].neighbors[n].target;
         if(G->nodes[v].team == i){
-            cw -= G->nodes[u].neighbors[i].weight;
+            delta -= G->nodes[u].neighbors[n].weight;
         }else if(G->nodes[v].team == j){
-            cw += G->nodes[u].neighbors[i].weight;
+            delta += G->nodes[u].neighbors[n].weight;
         }
     }
 
-    return cw;
+    return cw + delta;
 }
-
-/*
-G is new Graph
-D is new Graph
-*/
-// std::tuple<double, double, double, double, double, double*> fast_update_score(graph_t *G, graph_t *D, 
-//             double ck = NULL, double cw = NULL, double cp = NULL, double bnorm = NULL, double *b, int32_t k){
-//     if(!ck) {
-//         return first_update_score(D);
-//     }
-    
-//     std::list<int32_t> different_vertices;
-
-//     for(int i = 0; i < G->num_nodes; i++){
-//         if(G->nodes[i].team != D->nodes[i].team){
-//             different_vertices.push_back(i);
-//         }
-//     }
-
-//     //your code here
-//     for (std::list<int32_t>::iterator it = different_vertices.begin(); it != different_vertices.end(); ++it){
-//         int32_t new_team = D->nodes[*it].team;
-//         int32_t old_team = G->nodes[*it].team;
-//         auto[cp_new, bnorm_new] = update_cp(b, bnorm, G->num_nodes, old_team, new_team);
-//         double cw_new = update_cw(G, cw, *it, old_team, new_team);
-//         cw = cw_new;
-//         cp = cp_new;
-//         bnorm = bnorm_new;
-//         b = update_b(b, G->num_nodes, old_team, new_team);
-//         G->nodes[*it].team = new_team;
-//     }
-
-//     return {(cw+ ck + cp), ck, cw, cp, bnorm, b};
-
-// }
 
 //return is cost, ck, cw, cp, bnorm, b
 std::tuple<double, double, double, double, double, double*> first_update_score(graph_t *G){

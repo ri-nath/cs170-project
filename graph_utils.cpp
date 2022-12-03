@@ -57,6 +57,33 @@ void write_output(graph_t *G, const char *path){
     fclose(f);
 }
 
+void write_output(int32_t *teams, int32_t length, const char *path){
+    FILE *f;
+    f = fopen(path, "w");
+    fprintf(f, "[");
+    for(int i = 0; i < length -1 ; i++){
+        fprintf(f, "%d, ", teams[i]+1);
+    }
+    fprintf(f, "%d]", teams[length-1]+1);
+    fclose(f);
+}
+
+int32_t* copy_teams(graph_t *G){
+    int32_t *teams = (int32_t*) malloc(G->num_nodes * sizeof(int32_t));
+    for(int i = 0; i < G->num_nodes; i++){
+        teams[i] = G->nodes[i].team;
+    }
+    return teams;
+}
+
+int32_t* copy_teams(int32_t *teams_in, int32_t length){
+    int32_t *teams = (int32_t*) malloc(length * sizeof(int32_t));
+    for(int i = 0; i < length; i++){
+        teams[i] = teams_in[i];
+    }
+    return teams;
+}
+
 void resize(graph_t *G, int32_t index){
     if(G->nodes[index].num_neighbors + 1 == G->nodes[index].max_neighbors){
         G->nodes[index].max_neighbors *= 2;
