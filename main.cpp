@@ -14,10 +14,10 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     srand(time(0));
-    graph_t *G = read_input("student_inputs/small1.in", 100);
+    graph_t *G = read_input("student_inputs/large1.in", 1000);
     auto[B, score] = test_on_all_k(G, 5, true);
     printf("FINAL SCORE OF %f\n", score);
-    write_output(B, "test.out");
+    write_output(B, 1000, "test.out");
     // double sum = 0;
     // double weights[5] = {2, 1, 1, 1, 1};
     // int32_t choices[5] = {0, 0, 0, 0, 0,};
@@ -42,6 +42,6 @@ int main(int argc, char* argv[]) {
     // printf("HELLPPP");
 
 
-    free_graph(B);
+    free(B);
 
 }

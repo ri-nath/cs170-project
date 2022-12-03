@@ -30,7 +30,8 @@ graph_t* read_input(const char *path, int32_t size);
 graph_t* copy(graph_t* G);
 void free_graph(graph_t* G);
 void write_output(graph_t *G, const char *path);
+void write_output(int32_t *teams, int32_t length, const char *path);
 void gen_outputs(graph_t* (*solver)(graph_t*, int32_t, bool), const char *in, const char *out);
-int32_t* copy_teams(int32_t *teams_in, int32_t length);
 int32_t* copy_teams(graph_t *G);
+int32_t* copy_teams(int32_t *teams_in, int32_t length);
 #endif
