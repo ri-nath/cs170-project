@@ -26,10 +26,6 @@ double calculate_ck(int32_t k);
 int32_t calculate_k_bound(graph_t *G);
 bool compare_cost(const std::vector<double>& v1, const std::vector<double>& v2);
 
-int myisnan(double x) {
-  return std::isnan(x);
-}
-
 /*
 G is a graph
 K is the number of teams
@@ -54,12 +50,11 @@ std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
         scramble.pop_back();
         G->nodes[curr].team = i%k;
     }
-    // std::random_device rd;
-    // std::mt19937 rng(rd());
-    // std::uniform_int_distribution<int32_t> uni(0,k-1);
-    // for(int32_t i = 0; i < G->num_nodes; i++){
+
+    // for(int i = 0; i < G->num_nodes; i++){
     //     // auto random_integer = uni(rng);
-    //     G->nodes[i].team = uni(rng);
+    //     // std::uniform_int_distribution
+    //     G->nodes[i].team = rand() % k;
     // }
     // printf("Initial Scramble done\n");
     // printf("k=%i\n", k);
@@ -209,6 +204,7 @@ std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     // printf("count %d\n", count);
     // printf("counter %d\n", counter);
     free(b);
+    // printf("Finished Solver\n");
     return {B, best_cost};
 }
 
@@ -295,13 +291,8 @@ std::tuple<double, double> update_cp(double *b, double bnorm, int32_t v, int32_t
 }
 
 double* update_b(double *b, int32_t v, int32_t i, int32_t j, double bnorm){
-    // if(bnorm == 0){
-    //     b[i] = 0;
-    //     b[j] = 0;
-    // }else{
         b[i] -= (double)1/v;
         b[j] += (double)1/v;
-    // }
     
     return b;
 }

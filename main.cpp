@@ -39,17 +39,22 @@ int main(int argc, char* argv[]) {
     int32_t lengths[3] = {100, 300, 1000};
     #pragma omp parallel
     {
-        for(int32_t size = 0; size < 3; size++){
-            #pragma omp for
-            for(int32_t num = 1; num < 261; num++){
+        #pragma omp for
+        for(int32_t num = 1; num < 261; num++){
+            for(int32_t size = 0; size < 3; size++){
+                // printf("making curr\n");
                 std::string curr = sizes[size];
                 curr = curr + std::to_string(num);
+                // printf("Reading input\n");
                 graph_t *G = read_input((input_dir + curr + input_ext).c_str(), lengths[size]);
-                auto[B, score] = test_on_all_k(G, 50);
+                // printf("Starting next\n");
+                auto[B, score] = test_on_all_k(G, 10000);
                 printf("FINAL SCORE for %s OF %f\n", curr.c_str(), score);
                 write_output(B, lengths[size], (output_dir + curr + output_ext).c_str());
+                // printf("Wrote outputs\n");
                 free_graph(G);
                 free(B);
+                // printf("Freed Graphs\n");
             }
         }
     }
