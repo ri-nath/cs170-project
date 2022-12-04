@@ -123,5 +123,5 @@ def test_on_all_k(G, repeats=1, verbose=True):
     
     return B
 
-tar("rpg_outputs")
+tar("rpg_outputs_a")
 # gen_outputs(test_on_all_k, 'student_inputs', 'rpg_outputs')

@@ -80,7 +80,7 @@ std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
     // }
     double cost[k][5];
     // printf("Starting While\n");
-    while((count < stale) && (counter < G->num_nodes)){
+    while((count < stale) && (counter < 10*G->num_nodes)){
         // printf("Started While\n");
         counter++;
         
@@ -229,13 +229,9 @@ std::tuple<int32_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
         // printf("Graph number of nodes in test_on_all_k = %d\n", G->num_nodes);
         for(int i = 0; i < repeats; i++){
             // printf("k=%i\n", k);
-            auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
+            auto[G_new, curr_score] = solver(G, k, 3, 1, 1.5);
             // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
             // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
-            for(int32_t i = 0; i < G->num_nodes; i++){
-                // printf("i = %i\n", i);
-                G->nodes[i].team = G_new[i];
-            }
             // auto real_cost = first_update_score(G);
             // printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
             if(curr_score < best_score){
@@ -251,7 +247,6 @@ std::tuple<int32_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
             free(G_new);
             // printf("finished freeing G_new\n");
         }
-        
     }
     return {B, best_score};    
 }
