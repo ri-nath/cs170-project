@@ -55,9 +55,9 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
                     Cp_j, b_j, bnorm_j = update_Cp(b_j, bnorm, V, i, j)
 
                     delta_cost = (Cw_j - Cw) + (Cp_j - Cp)
-                    costs[j - 1] = (delta_cost, Cw_j, Cp_j, b_j, bnorm_j)
+                    costs[j - 1] = (delta_cost, Cw_j, Cp_j, bnorm_j)
                 else: 
-                    costs[j - 1] = (0, Cw, Cp, b, bnorm)
+                    costs[j - 1] = (0, Cw, Cp, bnorm)
 
             # Sort the teams by minimizing for the cost of swapping vertex u to that team.
             # Then, pick a team with probabilities weighted towards better choices. 
@@ -65,8 +65,12 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
             best_team = random.choices(sorted_i, weights=weights)[0]
 
             # Update the graph and fast scoring partials.
+            delta_cost, Cw, Cp, bnorm = costs[best_team]
+            b[G.nodes[u]['team']-1] -= 1/G.number_of_nodes()
+            b[best_team] += 1/G.number_of_nodes()
             G.nodes[u]['team'] = best_team + 1
-            delta_cost, Cw, Cp, b, bnorm = costs[best_team]
+            
+
             total_cost += delta_cost
 
         # Decrease the 'temperature' of the function. Epsilon approaches zero with many iterations.
@@ -83,7 +87,7 @@ def solver(G: nx.graph, k: int = 12, epochs: int = 5, epsilon: float = 0.5, deca
         else:
             count = 0
         
-    return B
+    return B, best_cost
 
 # ALGORITHM
 # Run solver on all k from k=1 to k=max viable k.
@@ -108,8 +112,9 @@ def test_on_all_k(G, repeats=1, verbose=True):
             return B
 
         for _ in range(repeats):
-            G = solver(G, k=k, epochs=5, epsilon=1, decay=1.5)
+            G, cost = solver(G, k=k, epochs=5, epsilon=1, decay=1.5)
             curr_score = score(G)
+            print(f'curr_score = {cost}, should be {curr_score}')
             
             if curr_score < best_score:
                 best_score, B = curr_score, G.copy()
@@ -121,5 +126,5 @@ def test_on_all_k(G, repeats=1, verbose=True):
 # test_vs_output(test_on_all_k, 'inputs/large.in', 'outputs/large.out')
 # test_on_input(test_on_all_k, 'student_inputs/small1.in')
 # test_on_input(solver, 'student_inputs/small1.in')
-# gen_outputs(test_on_all_k, 260, 'student_inputs', 'rpg_outputs', sizes=('large'))
-print(score(read_output(read_input("student_inputs/large1.in"), "test.out")))
+# gen_outputs(test_on_all_k, 'student_inputs', 'rpg_outputs')
+print(score(read_output(read_input("student_inputs/small1.in"), "rpg_outputs/small1.out")))

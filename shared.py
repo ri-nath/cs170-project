@@ -31,15 +31,13 @@ def update_Cp(b: np.array, bnorm: float, V: int, i: int, j: int) -> tuple[float,
 
     try:
         bnorm = math.sqrt(
-            bnorm ** 2 - b[i] ** 2 - b[j] ** 2 
-            + (b[i] - 1 / V) ** 2 + (b[j] + 1 / V) ** 2
-            )
-        b[i] -= 1 / V
-        b[j] += 1 / V
+            bnorm ** 2 - b[i] ** 2 - b[j] ** 2 + (b[i] - 1 / V) ** 2 + (b[j] + 1 / V) ** 2)
+        # b[i] -= 1 / V
+        # b[j] += 1 / V
     # Account for floating point error when b norm is zero
     except ValueError:
         bnorm = 0
-        b = np.zeros(len(b))
+        # b = np.zeros(len(b))
 
     # assert abs(bnorm - np.linalg.norm(b)) < 0.0001
 

@@ -1,3 +1,4 @@
+from multiprocessing import Process
 from starter import *
 from greedy import solver
 import random
@@ -77,13 +78,27 @@ def check_graphs():
 
 ## OUTPUTS (PHASE 2)
 
-def gen_outputs(solver: solver, n: int, in_folder: str, out_folder: str, overwrite: bool = False, sizes = ('small', 'medium', 'large'), start = 1, finish = 261):
+def gen_outputs(solver: solver, in_folder: str, out_folder: str, overwrite: bool = False, sizes = ('small', 'medium', 'large'), start = 1, finish = 261):
     for size in sizes:
         for n in range(start, finish):
             G = read_input(f'{in_folder}/{size}{n}.in')
             G = solver(G)
             print(f'{size}{n}: {score(G)}')
             write_output(G, f'{out_folder}/{size}{n}.out', overwrite=overwrite)
+
+def gen_outputs_multi(solver: solver, in_folder: str, out_folder: str, overwrite: bool = False, sizes = ('small', 'medium', 'large'), start = 1, finish = 261):
+    processes = [Process(target=task, args=(solver, n, in_folder, out_folder, size, overwrite)) for n in range(start, finish) for size in sizes]
+    for process in processes:
+        process.start()
+
+    for process in processes:
+        process.join()
+
+def task(solver: solver, n: int, in_folder: str, out_folder: str, size, overwrite: bool = False):
+    G = read_input(f'{in_folder}/{size}{n}.in')
+    G = solver(G)
+    print(f'{size}{n}: {score(G)}')
+    write_output(G, f'{out_folder}/{size}{n}.out', overwrite=overwrite)
 
 def target_output(solver: solver, in_file, out_file):
     print(f'Targeting {out_file}...')
