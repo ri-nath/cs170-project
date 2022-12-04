@@ -39,7 +39,7 @@ decay is what scales epsilon each timestep.
 */
 std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double epsilon, double decay){
     
-    //assigns random teams to the vertices
+    // assigns random teams to the vertices
     // printf("STARTED SOLVER on %d nodes\n", G->num_nodes);
     // printf("k=%i\n", k);
     std::vector<int32_t> scramble(G->num_nodes);
@@ -54,6 +54,13 @@ std::tuple<int32_t*, double> solver(graph_t *G, int32_t k, int32_t stale, double
         scramble.pop_back();
         G->nodes[curr].team = i%k;
     }
+    // std::random_device rd;
+    // std::mt19937 rng(rd());
+    // std::uniform_int_distribution<int32_t> uni(0,k-1);
+    // for(int32_t i = 0; i < G->num_nodes; i++){
+    //     // auto random_integer = uni(rng);
+    //     G->nodes[i].team = uni(rng);
+    // }
     // printf("Initial Scramble done\n");
     // printf("k=%i\n", k);
     double best_cost = std::numeric_limits<double>::infinity();
@@ -226,14 +233,14 @@ std::tuple<int32_t*, double> test_on_all_k(graph_t *G, int32_t repeats, bool ver
         // printf("Graph number of nodes in test_on_all_k = %d\n", G->num_nodes);
         for(int i = 0; i < repeats; i++){
             // printf("k=%i\n", k);
-            auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.2);
+            auto[G_new, curr_score] = solver(G, k, 3, 0.5, 1.5);
             // printf("Graph number of nodes after solver = %d\n", G->num_nodes);
             // printf("Curr score = %f, Best score = %f\n", curr_score, best_score);
             for(int32_t i = 0; i < G->num_nodes; i++){
                 // printf("i = %i\n", i);
                 G->nodes[i].team = G_new[i];
             }
-            auto real_cost = first_update_score(G);
+            // auto real_cost = first_update_score(G);
             // printf("total_cost = %f, should be = %f\n", curr_score, std::get<0>(real_cost));
             if(curr_score < best_score){
                 free(B);
