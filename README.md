@@ -2,8 +2,10 @@
 This repository contains utility functions which might be helpful for solving the project.
 
 ## Requirements
+### python
 `python >= 3.6` is needed for the python files.
 
+### C++
 C++ is needed if you want to recompile the code. If you have C++ already installed, then add [this package](https://json.nlohmann.me/integration/package_managers/#conda) using your preferred package manager.
 
 If you don’t have c++ installed, then follow [these instructions](https://www.msys2.org/) and then run:
