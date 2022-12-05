@@ -14,10 +14,12 @@ void add_edge(graph_t* G, int32_t source, int32_t target, int32_t weight);
 void resize(graph_t *G, int32_t index);
 
 //size is number of nodes
-graph_t* read_input(const char *path, int32_t size){
+graph_t* read_input(const char *path){
     FILE *file;
     file = fopen(path, "r");
     if(file == NULL) return NULL;
+    json data = json::parse(file);
+    int32_t size = data["nodes"].size();
     graph_t *G = (graph_t*) calloc(1, sizeof(graph_t));
     G->nodes = (node_t*) calloc(size, sizeof(node_t));
     G->num_nodes = size;
@@ -27,7 +29,7 @@ graph_t* read_input(const char *path, int32_t size){
         G->nodes[i].max_neighbors = 8;
     }
 
-    json data = json::parse(file);
+    
     json dat = data["links"];
     for (int32_t i = 0; i < dat.size(); i++) {
         json curr = dat.at(i);

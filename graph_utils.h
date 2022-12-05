@@ -26,7 +26,7 @@ typedef struct graph_t {
     node_t *nodes;
 } graph_t;
 
-graph_t* read_input(const char *path, int32_t size);
+graph_t* read_input(const char *path);
 graph_t* copy(graph_t* G);
 void free_graph(graph_t* G);
 void write_output(graph_t *G, const char *path);
